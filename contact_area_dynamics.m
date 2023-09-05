@@ -151,11 +151,13 @@ for num_clusters = [15,0]
     
     
     figure()
-    subplot(2,2,1:2)
+    %subplot(2,2,1:2)
     angles = linspace(0,2*pi,500);
     plot(rSurf*cos(angles), rSurf*sin(angles),'k-','Linewidth',2)
     hold on
-    plot(rNP*cos(angles), rNP*sin(angles),'r-','Linewidth',1)
+    plot([1:200]-750,zeros(1,200)-500,'k-','LineWidth',2)
+    text(100-750, -50-500, '200 nm','HorizontalAlignment','center')
+    %plot(rNP*cos(angles), rNP*sin(angles),'r-','Linewidth',1)
     for i = 1:length(tcr_pos)
         plot(rTCR*cos(angles)+tcr_pos(1,i),rTCR*sin(angles)+tcr_pos(2,i),'b-')
     end
@@ -175,7 +177,8 @@ for num_clusters = [15,0]
     
     bin_lim = round(max(nt));
     
-    subplot(2,2,3:4)
+    figure()
+    %subplot(2,2,3:4)
     histogram(nt,(0.5:bin_lim + 0.5), 'Normalization','probability','DisplayName','MC Sim')
     hold on
     %plot(bins,y1,'r-')
