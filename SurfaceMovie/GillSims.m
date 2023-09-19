@@ -17,7 +17,7 @@ k0 = 0.1;
 kon = 0.1;
 koff = 0.05;
 T0 = 1;
-rho = 0.1;
+rho = 1;
 np_params = [rNP, vh, k0, kon, koff, T0, rho];
 
 % Simulation Params
