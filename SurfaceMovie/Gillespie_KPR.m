@@ -1,4 +1,4 @@
-function [bound_tcr, bound_np, phos_tcr, time] = Gillespie_KPR(tcr_params, np_params, sim_params)
+function [bound_tcr, bound_np, phos_tcr, tcr_states, time] = Gillespie_KPR(tcr_params, np_params, sim_params)
     
     rSurf = tcr_params(1);
     num_clusters = tcr_params(2);

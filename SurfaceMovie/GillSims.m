@@ -21,7 +21,7 @@ rho = 1;
 np_params = [rNP, vh, k0, kon, koff, T0, rho];
 
 % Simulation Params
-total_t = 5000;
+total_t = 500;
 fps = 10;
 sim_params = [total_t, fps];
 total_sims = 100;
@@ -29,6 +29,7 @@ final_time = linspace(0,total_t,total_t*fps);
 
 % Strong ligand: 1-10s --> koff = 0.1-1
 % Weak ligand: 0.1-3s --> koff = 0.3-10
+%%
 
 i=1;
 for num_clusters = [15,0]
@@ -90,6 +91,7 @@ for num_clusters = [15,0]
     hold on
     histogram(cluster_bound_tcr,'Normalization','pdf','FaceColor', [0.3, 0.8, 0.5],'FaceAlpha', 0.5)
     ylabel('pdf')
+    xlim([1 20])
     title('Bound TCR')
 
     subplot(222)
@@ -97,6 +99,7 @@ for num_clusters = [15,0]
     hold on
     histogram(cluster_bound_np,'Normalization','pdf','FaceColor', [0.3, 0.8, 0.5],'FaceAlpha', 0.5)
     ylabel('pdf')
+    xlim([1 20])
     title('Bound NPs')
 
     subplot(223)
@@ -104,6 +107,7 @@ for num_clusters = [15,0]
     hold on
     histogram(cluster_phos_tcr,'Normalization','pdf','FaceColor', [0.3, 0.8, 0.5], 'FaceAlpha', 0.5, 'DisplayName','Strong Ligand')
     ylabel('pdf')
+    xlim([1 20])
     title('Phosph. TCRs')
     legend(gca,'Position',[0.5 0.35 0.2 0.1])
     
@@ -111,4 +115,19 @@ for num_clusters = [15,0]
     %saveas(gcf,file,'png');
     
     i=i+1;
+end
+
+%%
+np_params = [rNP, vh, k0, kon, koff, T0, rho];
+tcr_params = [rSurf, num_clusters, cluster_radius, tcr_per_cluster, num_tcr, rTCR];  
+
+[bound_tcr, bound_np, phos_tcr, tcr_states, time] = Gillespie_KPR(tcr_params, np_params, sim_params);
+
+tcr_transitions = tcr_states(:,2:end) - tcr_states(:,1:end-1);
+
+dwell_time = zeros(300);
+
+for i=1:300
+    bind_ind = find(tcr_transitions(i,:)==2);
+    unbind_ind = find(tcr_transitions(i,:)<0);
 end

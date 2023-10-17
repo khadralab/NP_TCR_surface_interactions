@@ -70,6 +70,7 @@ function [K_np,p_bound, nt, BoundTCRs] = MC_Surface(np_params, kinetic_params, t
         hold on
         plot([1:25],nt_pd ./ sum(nt_pd),'r-')
         xlabel('TCRs Covered Pre')
+        xlim([0 20])
         
         subplot(3,3,3*j-1)
         histogram(nt(BoundTCRs>0),'Normalization','pdf')
@@ -77,6 +78,7 @@ function [K_np,p_bound, nt, BoundTCRs] = MC_Surface(np_params, kinetic_params, t
         %histogram(nt(bind),'Normalization','pdf')
         plot([1:25], nt_bound ./sum(nt_bound),'r-')
         xlabel('TCRs Covered Post')
+        xlim([0 20])
         
         disp(find(nt(BoundTCRs>0)==1));
         
@@ -85,6 +87,7 @@ function [K_np,p_bound, nt, BoundTCRs] = MC_Surface(np_params, kinetic_params, t
         hold on
         plot([1:25], bd_pd ./ sum(bd_pd), 'r-')
         xlabel('Bound')
+        xlim([0 20])
 
         %DB_SCAN(tcr_pos',5)
         %disp('DBSCAN Completed...')

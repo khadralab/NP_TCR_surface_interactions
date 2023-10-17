@@ -10,7 +10,7 @@ choose_surface = 1;
 if choose_np == 1  
     k0= 0.1;
     kon=0.1;
-    koff=0.1;
+    koff=5;
     
     np_rho=1;
     vh = 5;
@@ -37,7 +37,7 @@ end
 
 % TCR Params
 if choose_surface == 1
-    rSurf = 3000;
+    rSurf = 1000;
     num_clusters = 15;
     cluster_radius = 50;
     tcr_per_cluster = 20;
@@ -45,7 +45,7 @@ if choose_surface == 1
     tcr_radius = 5;
     
 elseif choose_surface == 2
-    rSurf = 3000;
+    rSurf = 1000;
     num_clusters = 0;
     cluster_radius = 50;
     num_tcr = 20*15;
@@ -76,6 +76,45 @@ Selectivity(np_params, kinetic_params, tcr_params, 1);
 % MC Surface Coverage
 [K_np, p_bound, nt, BoundTCRs] = MC_Surface(np_params, kinetic_params, tcr_params, 1);
 
+%%
+
+vh = 5;
+nt = 10;
+k0 = 0.1;
+kon = 0.1;
+
+f = figure();
+
+for koff = [0.05, 0.5]
+  
+    kav = [];
+    theta = [];
+
+    for nt = [1:1:5]
+        k = np_avidity(vh,nt,k0,kon,koff);
+        kav = [kav, k];
+        theta = [theta, k / (1+k)];
+    end
+    
+    subplot(121)
+    semilogy([1:1:5], kav, 'DisplayName', [num2str(koff)],'Linewidth',2)
+    hold on
+    ylabel('Avidity')
+    xlabel('Covered TCRs')
+    xlim([1 5])
+    
+    
+    subplot(122)
+    plot([1:1:5], theta, 'DisplayName', [num2str(koff)],'Linewidth',2)
+    hold on
+    ylabel('Surface Coverage')
+    xlabel('Covered TCRs')
+    xlim([1 5])
+    l = legend('Location','southeast');
+    title(l,'$K_{\rm off}$','Interpreter','latex')
+    end
+
+set(findall(f,'-property','FontSize'),'FontSize',16)
 %%
 
 vh = 1;
@@ -179,7 +218,7 @@ ylabel('Bound TCRs')
 legend()
 
 %% 
-rSurf = 3000;
+rSurf = 1000;
 num_clusters = 15;
 cluster_radius = 50;
 tcr_per_cluster = 20;
@@ -208,7 +247,7 @@ ylabel('PDF')
 title('Carrying Capacity')
 
 fname = ['Cluster_cc'];
-saveas(gca,fname, 'png');
+%saveas(gca,fname, 'png');
 %% Compute the avidity of a given NP to the T cell surface
 %--------------------------------------------------------------------------
 function Kav = np_avidity(vh,nt,k0,kon,koff)
