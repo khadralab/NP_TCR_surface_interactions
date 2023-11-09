@@ -1,7 +1,5 @@
 clear all
 
-tstart = tic;
-
 % NP and Kinetic Params
 rNP = 20;
 vh = 5;
@@ -16,7 +14,7 @@ np_params = [rNP, vh, k0, kon, koff, T0, rho];
 total_t = 5000;
 fps = 10;
 sim_params = [total_t, fps];
-total_sims = 500;
+total_sims = 5;
 final_time = linspace(0,total_t,total_t*fps);
 
 % Strong ligand: 1-10s --> koff = 0.1-1
@@ -29,9 +27,11 @@ rho_vals = linspace(0.5,4,8);
 rho_vals = 10.^rho_vals;
 Time = zeros(1,length(rho_vals));
 
-for rho = rho_vals
-    tic
-    
+rho_vals = 10;
+
+tstart = tic;
+
+for rho = rho_vals    
      % Initialize variables
     cluster_bound_tcr = [];
     cluster_bound_np = [];
@@ -58,7 +58,9 @@ for rho = rho_vals
     ufile = ['LongSims/Dose-Response/koff50/Uniform_rho',num2str(round(rho*100))];
     
     nsims=0;
+    Tc = zeros(1,total_sims);
     while nsims < total_sims
+        tic
         [bound_tcr, bound_np, phos_tcr, states, time] = Gillespie_KPR(tcr_params, np_params, sim_params);
         bound_tcr = interp1(time, bound_tcr, final_time, 'previous');
         bound_np = interp1(time, bound_np, final_time, 'previous');
@@ -67,6 +69,7 @@ for rho = rho_vals
         cluster_bound_np = [cluster_bound_np; bound_np];
         cluster_phos_tcr = [cluster_phos_tcr; phos_tcr];
         nsims = nsims+1;
+        Tc(nsims) = toc;
     end
         
     % Homogeneous Surface
@@ -80,7 +83,9 @@ for rho = rho_vals
     file = ['Homo_v',num2str(vh),'r',num2str(rNP),'koff',num2str(koff*100)];
 
     nsims = 0;
+    Tu = zeros(1,total_sims);
     while nsims < total_sims
+        tic
         [bound_tcr, bound_np, phos_tcr, homo_states, time] = Gillespie_KPR(tcr_params, np_params, sim_params);
         bound_tcr = interp1(time, bound_tcr, final_time, 'previous');
         bound_np = interp1(time, bound_np, final_time, 'previous');
@@ -89,14 +94,15 @@ for rho = rho_vals
         homo_bound_np = [homo_bound_np; bound_np];
         homo_phos_tcr = [homo_phos_tcr; phos_tcr];
         nsims = nsims + 1;
+        Tu(nsims) = toc;
+        
     end
     
     save(ufile,'homo_bound_tcr','homo_bound_np','homo_phos_tcr')
     save(cfile,'cluster_bound_tcr','cluster_bound_np','cluster_phos_tcr')
     
-    Time(i) = toc
     i=i+1;
     
 end
 
-tend = toc(tstart)
+tend = toc(tstart);
