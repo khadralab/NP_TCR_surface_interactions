@@ -225,7 +225,7 @@ rho_vals = 10.^rho_vals;
 
 % k0 = (0.01, 0.05, 0.1, 0.5) * 100
 
-k0_vals = [1];
+k0_vals = [1, 5];
 
 mean_bound = zeros(length(k0_vals)*2,length(rho_vals));
 dev_bound = zeros(length(k0_vals)*2,length(rho_vals));
@@ -260,7 +260,7 @@ ylabel('Mean Bound TCRs')
 grid on
 grid minor
 hold off
-legend('Cluster 0.01', 'Uni 0.01')
+legend('C1', 'U1', 'C5', 'U5')
 
 %ylim([0 38])
 %breakyaxis([3,36])
@@ -269,10 +269,8 @@ set(findall(f7,'-property','FontSize'),'FontSize',16)
 %% Dose-Response Curves
 % Plots of results from DoseResponse.m for: (r,v, koff) = (20,5,0.05)
 
-rho_vals = linspace(-2,0,5);
+rho_vals = linspace(-2,1,7);
 rho_vals = 10.^rho_vals;
-
-rho_vals = [0.01, 0.03, 0.1, 0.31, 1];
 
 hols = autumn(3);
 cols = winter(3);
@@ -341,12 +339,12 @@ function [aC, aU, c3, u3] = DR_fitting(koff, rho_vals)
     aU = []; vU = [];
 
     for rho = rho_vals
-        load(['LongSims/Dose-Response/koff',num2str(koff*100),'/Cluster_rho',num2str(round(rho*100)),'.mat'])
+        load(['LongSims/Dose-Response/koff',num2str(koff*100),'/Cluster_rho',num2str(floor(rho*100)),'.mat'])
 
         aC = [aC, mean(cluster_bound_tcr(:,end))];
         vC = [vC, std(cluster_bound_tcr(:,end))];
 
-        load(['LongSims/Dose-Response/koff',num2str(koff*100),'/Uniform_rho',num2str(round(rho*100)),'.mat'])
+        load(['LongSims/Dose-Response/koff',num2str(koff*100),'/Uniform_rho',num2str(floor(rho*100)),'.mat'])
 
         aU = [aU, mean(homo_bound_tcr(:,end))];
         vU = [vU, std(homo_bound_tcr(:,end))];
