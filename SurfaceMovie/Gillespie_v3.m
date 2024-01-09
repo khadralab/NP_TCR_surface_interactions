@@ -32,23 +32,23 @@ function [bound_tcr, bound_np, phos_tcr, tcr_states, time] = Gillespie_v3(tcr_pa
     tcr_pos = single(tcr_pos); sample_pos = single(sample_pos);
     
     sample_nt = count_covered_tcrs(tcr_pos, sample_pos, rNP);
-    dist_tcr_to_np = mdist(sample_pos, tcr_pos);          % Distance of each possible NP to each TCR: size=(num_NP, num_tcr)
+    %dist_tcr_to_np = mdist(sample_pos, tcr_pos);          % Distance of each possible NP to each TCR: size=(num_NP, num_tcr)
     
     % Initialize state variables
     tcr_states = zeros(1,size(tcr_pos,2));
     
     t = 0;                  % Current simulation time
-    time = [0];             % Array of reaction times
+    time = t;             % Array of reaction times
     np_pos = 5000*ones(2,300);        % Array of bound NP positions
     nt = zeros(1,300);                % Current # TCRs covered by each bound NP
     bt = zeros(1,300);                % Current # TCRs bound by each bound NP
 
-    id_range = [1:300];             % Range of possible simultaneously bound NPs; Max = 300.
+    id_range = 1:300;             % Range of possible simultaneously bound NPs; Max = 300.
     tcr_np_id = zeros(1, num_tcr);  % For each TCR identify the NP index which is covering that TCR.
     
-    bound_tcr = [0];        % Array of bound TCRs over time
-    bound_np = [0];         % Array of bound NPs over time
-    phos_tcr = [0];         % Array of Phos TCRs over time
+    bound_tcr = 0;        % Array of bound TCRs over time
+    bound_np = 0;         % Array of bound NPs over time
+    phos_tcr = 0;         % Array of Phos TCRs over time
     dist_tcr_to_bound_np = mdist(np_pos, tcr_pos);
     
     j=1;                    % Index of NP to sample from
@@ -95,7 +95,7 @@ function [bound_tcr, bound_np, phos_tcr, tcr_states, time] = Gillespie_v3(tcr_pa
             sample_pos = generate_NPs(rSurf, 0, num_samples, []);
             sample_pos = single(sample_pos);
             sample_nt = count_covered_tcrs(tcr_pos, sample_pos, rNP);
-            dist_tcr_to_np = mdist(sample_pos, tcr_pos);
+            %dist_tcr_to_np = mdist(sample_pos, tcr_pos);
             
             j=1;
         end
@@ -129,8 +129,8 @@ function [bound_tcr, bound_np, phos_tcr, tcr_states, time] = Gillespie_v3(tcr_pa
             check = find(tcr_np_id == next_np_id);
             
             if isempty(check)
-                disp(['Next NP ID:', num2str(next_np_id)]);
-                disp(['Total Bound NPs:', num2str(max(tcr_np_id))]);
+                fprintf(['Next NP ID:', num2str(next_np_id),' \n']);
+                fprintf(['Total Bound NPs:', num2str(max(tcr_np_id)),' \n']);
                 error('Error: Cannot sample from empty array!');
             else
                 tcr_indx = datasample(check, 1,'Replace',false);
@@ -179,11 +179,18 @@ function [bound_tcr, bound_np, phos_tcr, tcr_states, time] = Gillespie_v3(tcr_pa
                 tcr_states(tcr_np_id == np_indx) = 0;
                 tcr_np_id(tcr_np_id == np_indx) = 0;
                 
+                tcr_np_id(tcr_np_id > np_indx)=tcr_np_id(tcr_np_id > np_indx)-1;
+                
                 np_pos(:,np_indx) = [5000; 5000];
+                np_pos = [np_pos(:,1:np_indx-1), circshift(np_pos(:,np_indx:end),-1,2)];
+                
                 dist_tcr_to_bound_np(np_indx,:) = 5000*ones(1,300);
+                dist_tcr_to_bound_np = [dist_tcr_to_bound_np(1:np_indx-1,:); circshift(dist_tcr_to_bound_np(np_indx:end,:),-1,1)];
 
                 bt(np_indx) = 0;
+                bt = [bt(1:np_indx-1), circshift(bt(np_indx:end),-1)];
                 nt(np_indx) = 0;
+                nt = [nt(1:np_indx-1), circshift(nt(np_indx:end),-1)];
             end
             
             % Check sum and raise error

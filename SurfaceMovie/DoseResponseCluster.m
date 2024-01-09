@@ -11,16 +11,18 @@ function [cluster_states] = DoseResponseCluster(rho_index)
     T0 = 1;
 
     % Simulation Params
+    computecanada = false;
+    
     if rho_index < 0
         total_t = 100;
         fps = 1000;
         sim_params = [total_t, fps];
     else
-        total_t = 100;
+        total_t = 10000;
         fps = 10;
         sim_params = [total_t, fps];
     end
-    total_sims = 100;
+    total_sims = 1;
     final_time = linspace(0,total_t,total_t*fps);
     
     % NP concentrations
@@ -45,12 +47,26 @@ function [cluster_states] = DoseResponseCluster(rho_index)
     num_tcr = 300;
     rTCR = 5;
     tcr_params = [rSurf, num_clusters, cluster_radius, tcr_per_cluster, num_tcr, rTCR];
-
+    
     cfile = ['LongSims/temp/koff',num2str(koff*100),'/Cluster_rho',num2str(floor(rho*100))];
+    
+    if computecanada == true
+         % Create a "local" cluster object
+        local_cluster = parcluster('local');
+
+        % Modify the JobStorageLocation to $SLURM_TMPDIR
+        local_cluster.JobStorageLocation = getenv('SLURM_TMPDIR');
+
+        % Start the parallel pool
+        parpool(local_cluster)
+        fprintf("Successfully initiated parpool \n")
+        
+        cfile = ['koff',num2str(koff*100),'/Cluster_rho',num2str(floor(rho*100))];
+    end
     
     save(cfile,'cluster_bound_tcr','cluster_bound_np','cluster_phos_tcr');
     
-    parfor nsims = 1:total_sims
+    for nsims = 1:total_sims
         [bound_tcr, bound_np, phos_tcr, cluster_states, time] = Gillespie_v3(tcr_params, np_params, sim_params);
         [time,j,~] = unique(time);
         bound_tcr = bound_tcr(j); bound_np = bound_np(j); phos_tcr = phos_tcr(j);
