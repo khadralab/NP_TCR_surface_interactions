@@ -7,7 +7,7 @@ function [cluster_states] = DoseResponseCluster(rho_index)
     vh = 5;
     k0 = 0.1;
     kon = 0.1;
-    koff = 0.01;
+    koff = 0.001;
     T0 = 1;
 
     % Simulation Params
@@ -18,11 +18,11 @@ function [cluster_states] = DoseResponseCluster(rho_index)
         fps = 1000;
         sim_params = [total_t, fps];
     else
-        total_t = 10000;
+        total_t = 20000;
         fps = 10;
         sim_params = [total_t, fps];
     end
-    total_sims = 1;
+    total_sims = 100;
     final_time = linspace(0,total_t,total_t*fps);
     
     % NP concentrations
@@ -31,13 +31,13 @@ function [cluster_states] = DoseResponseCluster(rho_index)
     rho = rho_vals(rho_index);
     
     % Initialize variables
-    cluster_bound_tcr = zeros(total_sims, total_t*fps);
-    cluster_bound_np = zeros(total_sims, total_t*fps);
-    cluster_phos_tcr = zeros(total_sims, total_t*fps);
+    %cluster_bound_tcr = zeros(total_sims, total_t*fps);
+    %cluster_bound_np = zeros(total_sims, total_t*fps);
+    %cluster_phos_tcr = zeros(total_sims, total_t*fps);
 
     np_params = [rNP, vh, k0, kon, koff, T0, rho];
 
-    disp(['rho = ',num2str(rho)]);
+    fprintf(['rho = ',num2str(rho),' \n']);
 
     % Cluster Surface
     rSurf = 1000;
@@ -48,7 +48,7 @@ function [cluster_states] = DoseResponseCluster(rho_index)
     rTCR = 5;
     tcr_params = [rSurf, num_clusters, cluster_radius, tcr_per_cluster, num_tcr, rTCR];
     
-    cfile = ['LongSims/temp/koff',num2str(koff*100),'/Cluster_rho',num2str(floor(rho*100))];
+    cfile = ['LongSims/temp/koff',num2str(koff*1000),'/Cluster_rho',num2str(floor(rho*100))];
     
     if computecanada == true
          % Create a "local" cluster object
@@ -64,20 +64,23 @@ function [cluster_states] = DoseResponseCluster(rho_index)
         cfile = ['koff',num2str(koff*100),'/Cluster_rho',num2str(floor(rho*100))];
     end
     
-    save(cfile,'cluster_bound_tcr','cluster_bound_np','cluster_phos_tcr');
+    %save(cfile,'cluster_bound_tcr','cluster_bound_np','cluster_phos_tcr');
     
     for nsims = 1:total_sims
-        [bound_tcr, bound_np, phos_tcr, cluster_states, time] = Gillespie_v3(tcr_params, np_params, sim_params);
+        [bound_tcr, bound_np, phos_tcr, cluster_states, time] = Gillespie_v4(tcr_params, np_params, sim_params);
         [time,j,~] = unique(time);
+        total_t = floor(time(end))+1;
+        final_time = linspace(0,total_t,total_t*fps);
+
         bound_tcr = bound_tcr(j); bound_np = bound_np(j); phos_tcr = phos_tcr(j);
         
         bound_tcr = interp1(time, bound_tcr, final_time, 'previous');
         bound_np = interp1(time, bound_np, final_time, 'previous');
         phos_tcr = interp1(time, phos_tcr, final_time, 'previous');
         
-        cluster_bound_tcr(nsims,:) = bound_tcr;
-        cluster_bound_np(nsims,:) = bound_np;
-        cluster_phos_tcr(nsims,:) = phos_tcr;
+        cluster_bound_tcr{nsims} = [bound_tcr; final_time];
+        cluster_bound_np{nsims} = [bound_np; final_time];
+        cluster_phos_tcr{nsims} = [phos_tcr; final_time];
     end
     
     save(cfile,'cluster_bound_tcr','cluster_bound_np','cluster_phos_tcr');

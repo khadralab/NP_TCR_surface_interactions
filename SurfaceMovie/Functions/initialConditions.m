@@ -1,5 +1,5 @@
 function [tcr_states, np_pos, bound_tcr, covered_tcr] = initialConditions(tcr_states, tcr_pos, np_pos, rSurf, rNP, vh)
-    maxNP = 200;
+    maxNP = 100;
     countNPs = floor(maxNP*rand(1));
     boundNPs = 0;
     

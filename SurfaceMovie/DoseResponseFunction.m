@@ -17,7 +17,7 @@ function [cluster_states] = DoseResponseFunction(rho_index)
         sim_params = [total_t, tau];
     else
         total_t = 1e4;
-        tau = 1/10;
+        tau = 1;
         sim_params = [total_t, tau];
     end
     total_sims = 100;

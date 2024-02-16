@@ -13,7 +13,7 @@ function [tcr_states, np_pos] = updateBoundNPs(tcr_states, tcr_pos, np_pos, e1, 
     
     temp_np_pos = generate_NPs(rSurf, 2*rNP, e1, []);
     
-    [temp_nt, covMatrix] = count_covered_tcrs(free_tcr_pos, temp_np_pos, rNP);
+    [temp_nt, ~] = count_covered_tcrs(free_tcr_pos, temp_np_pos, rNP);
     %temp_nt = sum(tcr_indx);
     temp_np_pos = temp_np_pos(:,temp_nt > 0);
     temp_nt = temp_nt(temp_nt > 0);
@@ -28,8 +28,7 @@ function [tcr_states, np_pos] = updateBoundNPs(tcr_states, tcr_pos, np_pos, e1, 
     
     % Filter successful bindings
     temp_np_pos = temp_np_pos(:, r1 < pbind);
-    temp_nt = temp_nt(r1 < pbind);
-    
+        
     if isempty(temp_np_pos)
         return
     end
@@ -37,10 +36,10 @@ function [tcr_states, np_pos] = updateBoundNPs(tcr_states, tcr_pos, np_pos, e1, 
     % Check for overlap with other NPs
     dist_between_nps = dist(temp_np_pos', np_pos);
     overlaps = dist_between_nps < 2*rNP;
-    [I, J] = find(overlaps);
+    [I, ~] = find(overlaps);
     temp_np_pos(:,I) = [];
     
-    [temp_nt, covMatrix] = count_covered_tcrs(tcr_pos, temp_np_pos, rNP);
+    [~, covMatrix] = count_covered_tcrs(tcr_pos, temp_np_pos, rNP);
     covMatrix = double(covMatrix);
     
     for i=1:size(temp_np_pos,2)
