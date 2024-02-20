@@ -11,6 +11,10 @@ function [tcr_states, np_pos] = updateBoundNPs(tcr_states, tcr_pos, np_pos, e1, 
         return
     end
     
+    if e1 > 200
+        e1 = 200;
+    end
+    
     temp_np_pos = generate_NPs(rSurf, 2*rNP, e1, []);
     
     [temp_nt, ~] = count_covered_tcrs(free_tcr_pos, temp_np_pos, rNP);

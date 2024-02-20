@@ -16,12 +16,11 @@ function [cluster_states] = DoseResponseFunction(rho_index)
         tau = 1;
         sim_params = [total_t, tau];
     else
-        total_t = 1e4;
-        tau = 1;
+        total_t = 1e2;
+        tau = 500;
         sim_params = [total_t, tau];
     end
-    total_sims = 100;
-    final_time = linspace(0,total_t,total_t/tau);
+    total_sims = 10;
     
     % NP concentrations
     rho_vals = linspace(-2,5,15);
@@ -48,7 +47,7 @@ function [cluster_states] = DoseResponseFunction(rho_index)
         [bound_tcr, bound_np, phos_tcr, cluster_states, time] = TauLeaping(tcr_params, np_params, sim_params);
         [time,j,~] = unique(time);
         total_t = floor(time(end))+1;
-        final_time = linspace(0,total_t,total_t/tau);
+        final_time = linspace(0,total_t,total_t*10);
 
         bound_tcr = bound_tcr(j); bound_np = bound_np(j); phos_tcr = phos_tcr(j);
         

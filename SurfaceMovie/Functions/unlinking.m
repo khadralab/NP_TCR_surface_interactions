@@ -14,5 +14,9 @@ function [tcr_states, bt, nt] = unlinking(tcr_states,b,e3,koff)
         nt = sum(tcr_states ~= 0, 1);
         b = koff*bt;
         cumb = cumsum(b) ./ sum(b);
+        
+        if sum(b) == 0
+            return
+        end
     end      
 end

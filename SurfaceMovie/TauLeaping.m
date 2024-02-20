@@ -79,15 +79,29 @@ function [bound_tcr, bound_np, phos_tcr, tcr_states, time] = TauLeaping(tcr_para
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Time of next reaction
-        %tau = -1/a0 * log(r1);
+        tau = sim_params(2);
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Frequency of each reaction within time-step tau.
+        
         e1 = poissrnd(a1*tau);      % Number of new NP arrivals
         e2 = poissrnd(a2*tau);      % Number of cross-linking reactions
         e3 = poissrnd(a3*tau);      % Number of unbinding events
         e4 = poissrnd(a4*tau);      % Number of phosphorylation events
+        
+        E = [e2, e3, e4];
+        
+        while any(E > bound_np(end))           % Condition to avoid large time steps with too many reactions.
+            tau = tau * bound_np(end) / max(E);
+            
+            e1 = poissrnd(a1*tau);      % Number of new NP arrivals
+            e2 = poissrnd(a2*tau);      % Number of cross-linking reactions
+            e3 = poissrnd(a3*tau);      % Number of unbinding events
+            e4 = poissrnd(a4*tau);      % Number of phosphorylation events
 
+            E = [e2, e3, e4];
+        end
+        
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Update state variables
         t = t+tau;
@@ -143,7 +157,7 @@ function [bound_tcr, bound_np, phos_tcr, tcr_states, time] = TauLeaping(tcr_para
         % Check convergence of state variables
         
         % Identify slowest kinetic variable
-        
+        %{
         slow_var = min([kon, koff, kp, k0, rho*T0]);
         window = floor(1/slow_var);
         
@@ -154,6 +168,6 @@ function [bound_tcr, bound_np, phos_tcr, tcr_states, time] = TauLeaping(tcr_para
         if conv1 == true && conv2 == true && conv3 == true
             convergence = true;
         end
-        
+        %}
     end
 end
