@@ -7,7 +7,7 @@ function pos = generate_pos(rSurf, dmin, num_points)
 
     i=2;
 
-    while i<=length(pos)
+    while i<=size(pos,2)
         d = dist(pos(:,i)',pos(:,1:i-1));
         min_d = min(d);
         nsims = 0;
