@@ -19,7 +19,7 @@ LongSims/
 		results will be saved to a temp directory.
 		
 	Simulation results are stored using the following file structure:
-		NP Radius/TCRs per Cluster/NP valence/koff/filename_NP_concentration.mat
+	NP Radius/TCRs per Cluster/NP valence/koff/filename_NP_concentration.mat
 		
 MutualInformation/
 	Results from our mutual information analysis. Mutual information was calculated
