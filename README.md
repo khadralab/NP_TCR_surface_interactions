@@ -6,7 +6,7 @@
 - Capacity Results/
 	
 	- Folder containing simulation results quantifying the surface capacity of bound
-NPs as well as distirbution of covered TCRs corresponding to results presented
+NPs as well as distribution of covered TCRs corresponding to results presented
 in Figure 1.
 
 - Functions/
@@ -16,14 +16,15 @@ in Figure 1.
 	the command: 		addpath(Functions/)
 	
 - LongSims/
-	
+	- Results from simulations are stored as .mat files and can be found at the following repository:
+
+  	- Simulation results are stored using the following file structure:
+		NP Radius/TCRs per Cluster/NP valence/koff/NP_concentration.mat
+   
 	- Functions for running simulations: DoseResponseFunction.m
 		Takes arguments 1-16 corresponding to index of 16 different NP
 		concentration values e.g. "DoseResponseFunction(10)". Simulation
 		results will be saved to a temp directory.
-		
-	- Simulation results are stored using the following file structure:
-		NP Radius/TCRs per Cluster/NP valence/koff/filename_NP_concentration.mat
 		
 - Mutual Information/
 	- Results from our mutual information analysis. Mutual information was calculated
